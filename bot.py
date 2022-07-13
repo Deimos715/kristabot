@@ -25,7 +25,7 @@ def start_message(message):
 def update_message_min_b(message):
     # parser_minfin_budget
     bot.send_message(message.chat.id, 'Запрос данных с Минфина России (Приказы)')
-    url = 'https://minfin.gov.ru/ru/perfomance/budget/classandaccounting/#'
+    url = 'https://minfin.gov.ru/ru/perfomance/budget/classandaccounting/npa/'
     headers = {
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 '
                       'Safari/537.36'
@@ -34,10 +34,10 @@ def update_message_min_b(message):
     pages = 2
     for page in range(1, int(pages) + 1):
         # передаем наши headers и params, где params словарь с параметром ключ:значение(page:'номер страницы')
-        response = requests.get(url, headers=headers, params={'page_57': page})
+        response = requests.get(url, headers=headers, params={'page_65': page})
         html = response.text
         soup = BeautifulSoup(html, 'html.parser')
-        blocks = soup.find_all('div', class_='doc-view-item doc-view ajax-link')[0:4]
+        blocks = soup.find_all('div', class_='doc-view-item doc-view ajax-link')
         bot.send_message(message.chat.id, f'Парсинг страницы {page} из {pages}...')
 
         my_bd_command.create_table_min()
@@ -95,7 +95,7 @@ def update_message_min_b(message):
 def update_message_min_m(message):
     # parser_minfin_methodology
     bot.send_message(message.chat.id, 'Запрос данных с Минфина России (Таблицы соответствия)')
-    url = 'https://minfin.gov.ru/ru/perfomance/budget/classandaccounting/#'
+    url = 'https://minfin.gov.ru/ru/perfomance/budget/classandaccounting/metod/'
     headers = {
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 '
                       'Safari/537.36'
@@ -104,10 +104,10 @@ def update_message_min_m(message):
     pages = 2
     for page in range(1, int(pages) + 1):
         # передаем наши headers и params, где params словарь с параметром ключ:значение(page:'номер страницы')
-        response = requests.get(url, headers=headers, params={'page_38': page})
+        response = requests.get(url, headers=headers, params={'page_65': page})
         html = response.text
         soup = BeautifulSoup(html, 'html.parser')
-        blocks = soup.find_all('div', class_='doc-view-item doc-view ajax-link')[4:10]
+        blocks = soup.find_all('div', class_='doc-view-item doc-view ajax-link')
         bot.send_message(message.chat.id, f'Парсинг страницы {page} из {pages}...')
 
         my_bd_command.create_table_min()
@@ -173,18 +173,12 @@ def update_message_ros(message):
     response = requests.get(url, headers=headers)
     html = response.text
     soup = BeautifulSoup(html, 'html.parser')
-    # pagination = soup.find('div', class_='pagination').find_all('a')
-    # if pagination:
-    #     pages = pagination[-2].text
-    # else:
-    #     pages = 1
-    # bot.send_message(message.chat.id, 'Всего страниц: ' + pages)
-    try:
-        pagination = soup.find('div', class_='pagination').find_all('a')
+    pagination = soup.find('div', class_='pagination').find_all('a')
+    if pagination:
         pages = pagination[-2].text
-    except:
+    else:
         pages = 1
-    bot.send_message(message.chat.id, f'Всего страниц: {pages}')
+    bot.send_message(message.chat.id, 'Всего страниц: ' + pages)
     data = []
     for page in range(1, int(pages) + 1):
         response = requests.get(url, headers=headers, params={'PAGEN_1': page})
@@ -196,8 +190,7 @@ def update_message_ros(message):
         my_bd_command.create_table_ros()
 
         for block in blocks:
-            title = block.find('div', class_='news-info__name').get_text(strip=True).replace('\xa0', ' ').replace('\r\n'
-                                                                                                                  , ' ')
+            title = block.find('div', class_='news-info__name').get_text(strip=True)
             publication = block.find('span', class_='date').get_text(strip=True)
             pdf_link = 'https://www.roskazna.gov.ru/' + block.find('div', class_='news-info').find('a').get('href')
 
