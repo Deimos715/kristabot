@@ -1,0 +1,16 @@
+[Unit]
+Description=Kristabot
+After=network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/root/kristabot/venv/bin/python3 /root/kristabot/bot.py
+ExecReload=/root/kristabot/bot.py
+WorkingDirectory=/root/kristabot/
+KillMode=process
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
