@@ -64,34 +64,37 @@ def create_table_min():
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS MINFIN(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        link_doc TEXT
-        tag TEXT,
+        title TEXT,
         date_doc TEXT,
-        type_doc TEXT,
-        title_doc TEXT,
-        file_info_doc TEXT,
+        description TEXT,
+        status TEXT,
+        publication TEXT,
+        link_view TEXT,
+        doc_link_one TEXT,
+        doc_link_two TEXT,
         parsing_date DATE
         );''')
         db.commit()
 
 
-def insert_min(col1, col2, col3, col4, col5, col6):
+def insert_min(col1, col2, col3, col4, col5, col6, col7, col8):
     # Вставка в таблицу БД
     with sqlite3.connect('bot_bd.db') as db:
         cursor = db.cursor()
-        data_list = (col1, col2, col3, col4, str(col5), str(col6), datetime.datetime.now())
+        data_list = (col1, col2, col3, col4, col5, str(col6), col7, str(col8), datetime.datetime.now())
         cursor.execute('''
-                        INSERT INTO minfin (link_doc, tag, date_doc, type_doc, title_doc, file_info_doc, parsing_date)
-                        VALUES (?, ?, ?, ?, ?, ?, ?);
+                        INSERT INTO minfin (title, date_doc, description, status, publication, link_view, 
+                        doc_link_one, doc_link_two, parsing_date)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
                             ''', data_list)
         db.commit()
 
 
-def check_min(link_doc):
+def check_min(doc_link_one):
     # Проверка записи на наличие в базе
     with sqlite3.connect('bot_bd.db') as db:
         cursor = db.cursor()
-        cursor.execute('''SELECT link_doc FROM minfin WHERE link_doc = ? ''', (link_doc,))
+        cursor.execute('''SELECT doc_link_one FROM minfin WHERE doc_link_one = ? ''', (doc_link_one,))
         result = cursor.fetchall()
         if len(result) == 0:
             print('[INFO] Такой записи нет')
@@ -105,7 +108,8 @@ def get_data_from_db_min():
     # Получение данных из БД
     with sqlite3.connect('bot_bd.db') as db:
         cursor = db.cursor()
-        cursor.execute('''SELECT link_doc, tag, date_doc, type_doc, title_doc, file_info_doc FROM minfin''')
+        cursor.execute('''SELECT title, date_doc, description, status, publication, link_view, doc_link_one, 
+                        doc_link_two FROM minfin''')
         # Вывод всех документов
         data_set = cursor.fetchall()
         return data_set
