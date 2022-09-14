@@ -29,22 +29,16 @@ def update_message_min_b(message):
     bot.send_message(message.chat.id, 'Запрос данных с Минфина России (Приказы)')
 
     def get_html(url, params=None):
-        headers = {
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) '
-                          'Chrome/87.0.4280.66 '
-                          'Safari/537.36'
-        }
+        headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) (KHTML, like Gecko) Chrome/87.0.4280.66'}
         response = requests.get(url, headers=headers, params=params)
         html = response.text
         return html
 
     def get_pages_count(html):
         soup = BeautifulSoup(html, 'html.parser')
-        # Находим количество страниц
         try:
             pagination = soup.find('a', class_='button_more').get("data-page-count")
             bot.send_message(message.chat.id, 'Всего страниц: ' + pagination)
-            bot.send_message(message.chat.id, 'Парсим первые две страницы:')
             return int(pagination)
         except Exception:
             bot.send_message(message.chat.id, 'Количество страниц не найдено')
@@ -58,7 +52,7 @@ def update_message_min_b(message):
             try:
                 link_doc = 'https://minfin.gov.ru' + block.get('data-href')
             except:
-                link_doc = 'Ссылка на документ'
+                link_doc = 'Ссылка на документ не найдена'
 
             try:
                 tag = block.find('ul', class_='tag_list').get_text(strip=True)
@@ -81,23 +75,45 @@ def update_message_min_b(message):
                 title_doc = 'Заголовок документа не найден'
 
             try:
-                file_info_doc = 'https://minfin.gov.ru/' + block.find('a', class_='download_btn').get(
+                file_info_doc = 'https://minfin.gov.ru' + block.find('a', class_='download_btn').get(
                     'href')
             except:
                 file_info_doc = 'Ссылка на файл не найдена'
 
+            """Далее проваливаемся в ссылку карточки и берем оттуда ссылку на файл и данные о регистрации"""
+            sub_page_soup = BeautifulSoup(get_html(link_doc), 'html.parser')
+            try:
+                reg = sub_page_soup.find('div', class_='page_description').get_text(strip=True)
+            except:
+                reg = 'Регистрационная информация не найдена'
+            try:
+                link_download = 'https://minfin.gov.ru' + sub_page_soup.find('a', class_='download_btn').get('href')
+            except:
+                link_download = 'Доп. ссылка на файл не найдена'
+
             try:
                 if my_bd_command.check_min(link_doc) == 0:
-                    my_bd_command.insert_min(link_doc, tag, date_doc, type_doc, title_doc, file_info_doc)
-
+                    my_bd_command.insert_min(link_doc, tag, date_doc, type_doc, title_doc, file_info_doc, reg,
+                                             link_download)
                     data.append({
                         'Ссылка на документ': link_doc,
                         'Тег': tag,
                         'Дата опубликования': date_doc,
                         'Тип документа': type_doc,
                         'Заголовок документа': title_doc,
-                        'Ссылка на файл': file_info_doc
+                        'Ссылка на файл': file_info_doc,
+                        # Детализация документа
+                        'Зарегистрирован': reg,
+                        'Доп. ссылка на файл:': link_download
                     })
+                    bot.send_message(message.chat.id,
+                                     f'Ссылка: {link_doc}\n'
+                                     f'Свойство: {tag}\n'
+                                     f'Дата публикации: {date_doc.replace("Опубликовано: ", "")}\n'
+                                     f'Тип документа: {type_doc}\nЗаголовок: {title_doc}\n'
+                                     f'Ссылка на файл: {file_info_doc}\n'
+                                     f'Регистрационная информация: {reg}\n'
+                                     f'Доп. ссылка на файл: {link_download}\n')
                     bot.send_message(message.chat.id, '[INFO] Документ добавлен в БД')
 
             except Exception as ex:
@@ -108,17 +124,14 @@ def update_message_min_b(message):
 
     def parser(url):
         pages = get_pages_count(get_html(url))
-        num_page = 2
-        # Проходимся по все страницам и получаем данные
         data = []
-        for page in range(1, int(num_page) + 1):
+        pages = 2  # берем для примера только 2 страницы
+        for page in range(1, pages + 1):
+            bot.send_message(message.chat.id, f'Сбор со страницы {page}')
             while True:
                 try:
-                    html = get_html(url, params={'page_65': page})
-                    bot.send_message(message.chat.id, f'Парсинг страницы {page} из {pages}...')
-                    data.extend(get_content(html))
-                    # Выставим задержку между страницами, чтоб сайт не заблочил нас
-                    time.sleep(uniform(1, 2))
+                    data.extend(get_content(get_html(url, params={'page_65': page})))
+                    time.sleep(1)
                     break
                 except:
                     bot.send_message(message.chat.id, 'Доступ прерван, ждем 5 сек.')
@@ -126,8 +139,6 @@ def update_message_min_b(message):
                         time.sleep(1)
                         bot.send_message(message.chat.id, f'{sec}...')
                     bot.send_message(message.chat.id, 'перезапуск')
-        for i in data:
-            bot.send_message(message.chat.id, (str(i).replace('{', '').replace('}', '').replace("'", "")))
         bot.send_message(message.chat.id, 'Получено ' + str(len(data)) + ' позиций(-я, -и)')
 
     parser('https://minfin.gov.ru/ru/perfomance/budget/classandaccounting/npa')
@@ -136,25 +147,19 @@ def update_message_min_b(message):
 @bot.message_handler(commands=['get_min_m'])
 def update_message_min_m(message):
     # parser_minfin_methodology
-    bot.send_message(message.chat.id, 'Запрос данных с Минфина России (Таблицы соответствия)')
+    bot.send_message(message.chat.id, 'Запрос данных с Минфина России (Приказы)')
 
     def get_html(url, params=None):
-        headers = {
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) '
-                          'Chrome/87.0.4280.66 '
-                          'Safari/537.36'
-        }
+        headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) (KHTML, like Gecko) Chrome/87.0.4280.66'}
         response = requests.get(url, headers=headers, params=params)
         html = response.text
         return html
 
     def get_pages_count(html):
         soup = BeautifulSoup(html, 'html.parser')
-        # Находим количество страниц
         try:
             pagination = soup.find('a', class_='button_more').get("data-page-count")
             bot.send_message(message.chat.id, 'Всего страниц: ' + pagination)
-            bot.send_message(message.chat.id, 'Парсим первые две страницы:')
             return int(pagination)
         except Exception:
             bot.send_message(message.chat.id, 'Количество страниц не найдено')
@@ -168,7 +173,7 @@ def update_message_min_m(message):
             try:
                 link_doc = 'https://minfin.gov.ru' + block.get('data-href')
             except:
-                link_doc = 'Ссылка на документ'
+                link_doc = 'Ссылка на документ не найдена'
 
             try:
                 tag = block.find('ul', class_='tag_list').get_text(strip=True)
@@ -191,44 +196,63 @@ def update_message_min_m(message):
                 title_doc = 'Заголовок документа не найден'
 
             try:
-                file_info_doc = 'https://minfin.gov.ru/' + block.find('a', class_='download_btn').get(
+                file_info_doc = 'https://minfin.gov.ru' + block.find('a', class_='download_btn').get(
                     'href')
             except:
-                file_info_doc = 'Ссылка на файл найдена'
+                file_info_doc = 'Ссылка на файл не найдена'
+
+            """Далее проваливаемся в ссылку карточки и берем оттуда ссылку на файл и данные о регистрации"""
+            sub_page_soup = BeautifulSoup(get_html(link_doc), 'html.parser')
+            try:
+                reg = sub_page_soup.find('div', class_='page_description').get_text(strip=True)
+            except:
+                reg = 'Регистрационная информация не найдена'
+            try:
+                link_download = 'https://minfin.gov.ru' + sub_page_soup.find('a', class_='download_btn').get('href')
+            except:
+                link_download = 'Доп. ссылка на файл не найдена'
 
             try:
                 if my_bd_command.check_min(link_doc) == 0:
-                    my_bd_command.insert_min(link_doc, tag, date_doc, type_doc, title_doc, file_info_doc)
-
+                    my_bd_command.insert_min(link_doc, tag, date_doc, type_doc, title_doc, file_info_doc, reg,
+                                             link_download)
                     data.append({
                         'Ссылка на документ': link_doc,
                         'Тег': tag,
                         'Дата опубликования': date_doc,
                         'Тип документа': type_doc,
                         'Заголовок документа': title_doc,
-                        'Ссылка на файл': file_info_doc
+                        'Ссылка на файл': file_info_doc,
+                        # Детализация документа
+                        'Зарегистрирован': reg,
+                        'Доп. ссылка на файл:': link_download
                     })
+                    bot.send_message(message.chat.id,
+                                     f'Ссылка: {link_doc}\n'
+                                     f'Свойство: {tag}\n'
+                                     f'Дата публикации: {date_doc.replace("Опубликовано: ", "")}\n'
+                                     f'Тип документа: {type_doc}\nЗаголовок: {title_doc}\n'
+                                     f'Ссылка на файл: {file_info_doc}\n'
+                                     f'Регистрационная информация: {reg}\n'
+                                     f'Доп. ссылка на файл: {link_download}\n')
                     bot.send_message(message.chat.id, '[INFO] Документ добавлен в БД')
 
             except Exception as ex:
+                bot.send_message(message.chat.id, '[X] Ошибка вставки данных в БД', ex)
                 continue
-
         bot.send_message(message.chat.id, 'Количество новых документов: ' + str(len(data)))
         return data
 
     def parser(url):
         pages = get_pages_count(get_html(url))
-        num_page = 2
-        # Проходимся по все страницам и получаем данные
         data = []
-        for page in range(1, int(num_page) + 1):
+        pages = 2  # берем для примера только 2 страницы
+        for page in range(1, pages + 1):
+            bot.send_message(message.chat.id, f'Сбор со страницы {page}')
             while True:
                 try:
-                    html = get_html(url, params={'page_65': page})
-                    bot.send_message(message.chat.id, f'Парсинг страницы {page} из {pages}...')
-                    data.extend(get_content(html))
-                    # Выставим задержку между страницами, чтоб сайт не заблочил нас
-                    time.sleep(uniform(1, 2))
+                    data.extend(get_content(get_html(url, params={'page_65': page})))
+                    time.sleep(1)
                     break
                 except:
                     bot.send_message(message.chat.id, 'Доступ прерван, ждем 5 сек.')
@@ -236,8 +260,6 @@ def update_message_min_m(message):
                         time.sleep(1)
                         bot.send_message(message.chat.id, f'{sec}...')
                     bot.send_message(message.chat.id, 'перезапуск')
-        for i in data:
-            bot.send_message(message.chat.id, (str(i).replace('{', '').replace('}', '').replace("'", "")))
         bot.send_message(message.chat.id, 'Получено ' + str(len(data)) + ' позиций(-я, -и)')
 
     parser('https://minfin.gov.ru/ru/perfomance/budget/classandaccounting/metod')
