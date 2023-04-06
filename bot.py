@@ -1,5 +1,6 @@
 import config
 import telebot
+import datetime
 import time
 import schedule
 import threading
@@ -99,7 +100,10 @@ def scheduler():
     schedule.every().day.at("07:05").do(scheduled_task_min_m)
     schedule.every().day.at("07:10").do(scheduled_task_ros)
     while True:
-        schedule.run_pending()
+        now = datetime.datetime.now()
+        # Проверяем, является ли текущий день рабочим днем
+        if now.weekday() in range(0, 5):
+            schedule.run_pending()
         time.sleep(1)
 
 
