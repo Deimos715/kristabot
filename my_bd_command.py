@@ -90,11 +90,11 @@ def insert_min(col1, col2, col3, col4, col5, col6, col7, col8):
         db.commit()
 
 
-def check_min(link_doc):
+def check_min(file_info_doc):
     # Проверка записи на наличие в базе
     with sqlite3.connect('bot_bd.db') as db:
         cursor = db.cursor()
-        cursor.execute('''SELECT link_doc FROM minfin WHERE link_doc = ? ''', (link_doc,))
+        cursor.execute('''SELECT file_info_doc FROM minfin WHERE file_info_doc = ? ''', (file_info_doc,))
         result = cursor.fetchall()
         if len(result) == 0:
             print('[INFO] Такой записи нет')
