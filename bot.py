@@ -44,7 +44,7 @@ def update_message_min_m(message):
     # parser_minfin_methodology
     url = 'https://minfin.gov.ru/ru/perfomance/budget/classandaccounting/metod'
 
-    bot.send_message(message.chat.id, 'Запрос данных с Минфина России (Приказы)')
+    bot.send_message(message.chat.id, 'Запрос данных с Минфина России (Таблицы)')
 
     html = scripts.get_html_min_m(url)
 

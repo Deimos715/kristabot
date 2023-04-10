@@ -91,12 +91,13 @@ def get_content_min_b(html):
                     'Доп. ссылка на файл:': link_download
                 })
                 bot.send_message(355908770,
-                                 f'Ссылка: {link_doc}\n'
                                  f'Свойство: {tag}\n'
+                                 f'Заголовок: {title_doc}\n'
+                                 f'Тип документа: {type_doc}\n'
                                  f'Дата публикации: {date_doc.replace("Опубликовано: ", "")}\n'
-                                 f'Тип документа: {type_doc}\nЗаголовок: {title_doc}\n'
-                                 f'Ссылка на файл: {file_info_doc}\n'
                                  f'Регистрационная информация: {reg}\n'
+                                 f'Ссылка: {link_doc}\n'
+                                 f'Ссылка на файл: {file_info_doc}\n'
                                  f'Доп. ссылка на файл: {link_download}\n')
                 bot.send_message(355908770, '[INFO] Документ добавлен в БД')
 
@@ -209,12 +210,13 @@ def get_content_min_m(html):
                     'Доп. ссылка на файл:': link_download
                 })
                 bot.send_message(355908770,
-                                 f'Ссылка: {link_doc}\n'
                                  f'Свойство: {tag}\n'
+                                 f'Заголовок: {title_doc}\n'
+                                 f'Тип документа: {type_doc}\n'
                                  f'Дата публикации: {date_doc.replace("Опубликовано: ", "")}\n'
-                                 f'Тип документа: {type_doc}\nЗаголовок: {title_doc}\n'
-                                 f'Ссылка на файл: {file_info_doc}\n'
                                  f'Регистрационная информация: {reg}\n'
+                                 f'Ссылка: {link_doc}\n'
+                                 f'Ссылка на файл: {file_info_doc}\n'
                                  f'Доп. ссылка на файл: {link_download}\n')
                 bot.send_message(355908770, '[INFO] Документ добавлен в БД')
 
@@ -301,6 +303,13 @@ def get_content_ros(html):
                     'Дата документа': publication,
                     'Ссылка на PDF файл': pdf_link
                 })
+
+                bot.send_message(355908770,
+                                 f'Заголовок документа: {title}\n'
+                                 f'Дата документа: {publication}\n'
+                                 f'Ссылка на PDF файл: {pdf_link}\n')
+                bot.send_message(355908770, '[INFO] Документ добавлен в БД')
+
         except Exception as ex:
             bot.send_message(355908770, '[X] Ошибка вставки данных в БД', ex)
             continue
