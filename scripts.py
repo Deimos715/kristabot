@@ -303,7 +303,6 @@ def get_content_ros(html):
                     'Дата документа': publication,
                     'Ссылка на PDF файл': pdf_link
                 })
-
                 bot.send_message(355908770,
                                  f'Заголовок документа: {title}\n'
                                  f'Дата документа: {publication}\n'
@@ -336,6 +335,4 @@ def parser_ros(url):
                     time.sleep(1)
                     bot.send_message(355908770, f'{sec}...')
                 bot.send_message(355908770, 'перезапуск')
-    for i in data:
-        bot.send_message(355908770, (str(i).replace('{', '').replace('}', '').replace("'", "")))
     bot.send_message(355908770, 'Получено ' + str(len(data)) + ' позиций(-я, -и)')
