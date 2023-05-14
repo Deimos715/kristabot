@@ -54,7 +54,7 @@ def get_content_min_b(html):
             type_doc = 'Тип документа не найден'
 
         try:
-            title_doc = block.find('p', class_='document_title').get_text(strip=True)
+            title_doc = block.find('a', class_='document_title').get_text(strip=True)
         except:
             title_doc = 'Заголовок документа не найден'
 
@@ -76,7 +76,7 @@ def get_content_min_b(html):
             link_download = 'Доп. ссылка на файл не найдена'
 
         try:
-            if my_bd_command.check_min(file_info_doc) == 0:
+            if my_bd_command.check_min(link_download) == 0:
                 my_bd_command.insert_min(link_doc, tag, date_doc, type_doc, title_doc, file_info_doc, reg,
                                          link_download)
                 data.append({
@@ -173,7 +173,7 @@ def get_content_min_m(html):
             type_doc = 'Тип документа не найден'
 
         try:
-            title_doc = block.find('p', class_='document_title').get_text(strip=True)
+            title_doc = block.find('a', class_='document_title').get_text(strip=True)
         except:
             title_doc = 'Заголовок документа не найден'
 
@@ -195,7 +195,7 @@ def get_content_min_m(html):
             link_download = 'Доп. ссылка на файл не найдена'
 
         try:
-            if my_bd_command.check_min(file_info_doc) == 0:
+            if my_bd_command.check_min(link_download) == 0:
                 my_bd_command.insert_min(link_doc, tag, date_doc, type_doc, title_doc, file_info_doc, reg,
                                          link_download)
                 data.append({
