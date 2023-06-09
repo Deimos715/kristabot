@@ -190,7 +190,7 @@ def get_content_min_m(html):
         except:
             reg = 'Регистрационная информация не найдена'
         try:
-            link_download = 'https://minfin.gov.ru' + sub_page_soup.find('a', class_='download_btn').get('href')
+            link_download = 'https://minfin.gov.ru' + sub_page_soup.find('a', class_='button_download').get('href')
         except:
             link_download = 'Доп. ссылка на файл не найдена'
 
