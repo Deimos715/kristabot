@@ -254,10 +254,9 @@ def get_html_ros(url, params=None):
                       'Chrome/87.0.4280.66 '
                       'Safari/537.36'
     }
-    response = requests.get(url, headers=headers, params=params)
+    response = requests.get(url, headers=headers, params=params, verify=False)
     html = response.text
     return html
-
 
 def get_pages_count_ros(html):
     soup = BeautifulSoup(html, 'html.parser')
@@ -268,10 +267,12 @@ def get_pages_count_ros(html):
             pages = pagination[-2].text
         else:
             pages = 1
-        bot.send_message(355908770, 'Всего страниц: ' + str(pages))
-        return pages
     except Exception:
-        bot.send_message(355908770, 'Количество страниц не найдено')
+        pages = 1
+        bot.send_message(355908770, 'Пагинация не найдена, страница будет обработана как единственная')
+
+    bot.send_message(355908770, 'Всего страниц: ' + str(pages))
+    return int(pages)
 
 
 def get_content_ros(html):
