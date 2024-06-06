@@ -78,7 +78,7 @@ def get_content_min_b(html):
         try:
             if my_bd_command.check_min(link_download) == 0:
                 my_bd_command.insert_min(link_doc, tag, date_doc, type_doc, title_doc, file_info_doc, reg,
-                                         link_download)
+                                        link_download)
                 data.append({
                     'Ссылка на документ': link_doc,
                     'Тег': tag,
@@ -91,14 +91,14 @@ def get_content_min_b(html):
                     'Доп. ссылка на файл:': link_download
                 })
                 bot.send_message(355908770,
-                                 f'Свойство: {tag}\n'
-                                 f'Заголовок: {title_doc}\n'
-                                 f'Тип документа: {type_doc}\n'
-                                 f'Дата публикации: {date_doc.replace("Опубликовано: ", "")}\n'
-                                 f'Регистрационная информация: {reg}\n'
-                                 f'Ссылка: {link_doc}\n'
-                                 f'Ссылка на файл: {file_info_doc}\n'
-                                 f'Доп. ссылка на файл: {link_download}\n')
+                                f'Свойство: {tag}\n'
+                                f'Заголовок: {title_doc}\n'
+                                f'Тип документа: {type_doc}\n'
+                                f'Дата публикации: {date_doc.replace("Опубликовано: ", "")}\n'
+                                f'Регистрационная информация: {reg}\n'
+                                f'Ссылка: {link_doc}\n'
+                                f'Ссылка на файл: {file_info_doc}\n'
+                                f'Доп. ссылка на файл: {link_download}\n')
                 bot.send_message(355908770, '[INFO] Документ добавлен в БД')
 
         except Exception as ex:
@@ -197,7 +197,7 @@ def get_content_min_m(html):
         try:
             if my_bd_command.check_min(link_download) == 0:
                 my_bd_command.insert_min(link_doc, tag, date_doc, type_doc, title_doc, file_info_doc, reg,
-                                         link_download)
+                                        link_download)
                 data.append({
                     'Ссылка на документ': link_doc,
                     'Тег': tag,
@@ -210,14 +210,14 @@ def get_content_min_m(html):
                     'Доп. ссылка на файл:': link_download
                 })
                 bot.send_message(355908770,
-                                 f'Свойство: {tag}\n'
-                                 f'Заголовок: {title_doc}\n'
-                                 f'Тип документа: {type_doc}\n'
-                                 f'Дата публикации: {date_doc.replace("Опубликовано: ", "")}\n'
-                                 f'Регистрационная информация: {reg}\n'
-                                 f'Ссылка: {link_doc}\n'
-                                 f'Ссылка на файл: {file_info_doc}\n'
-                                 f'Доп. ссылка на файл: {link_download}\n')
+                                f'Свойство: {tag}\n'
+                                f'Заголовок: {title_doc}\n'
+                                f'Тип документа: {type_doc}\n'
+                                f'Дата публикации: {date_doc.replace("Опубликовано: ", "")}\n'
+                                f'Регистрационная информация: {reg}\n'
+                                'Ссылка: {link_doc}\n'
+                                f'Ссылка на файл: {file_info_doc}\n'
+                                f'Доп. ссылка на файл: {link_download}\n')
                 bot.send_message(355908770, '[INFO] Документ добавлен в БД')
 
         except Exception as ex:
@@ -251,8 +251,8 @@ def parser_min_m(url):
 def get_html_ros(url, params=None):
     headers = {
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) '
-                      'Chrome/87.0.4280.66 '
-                      'Safari/537.36'
+                    'Chrome/87.0.4280.66 '
+                    'Safari/537.36'
     }
     response = requests.get(url, headers=headers, params=params, verify=False)
     html = response.text
@@ -305,9 +305,9 @@ def get_content_ros(html):
                     'Ссылка на PDF файл': pdf_link
                 })
                 bot.send_message(355908770,
-                                 f'Заголовок документа: {title}\n'
-                                 f'Дата документа: {publication}\n'
-                                 f'Ссылка на PDF файл: {pdf_link}\n')
+                                f'Заголовок документа: {title}\n'
+                                f'Дата документа: {publication}\n'
+                                f'Ссылка на PDF файл: {pdf_link}\n')
                 bot.send_message(355908770, '[INFO] Документ добавлен в БД')
 
         except Exception as ex:

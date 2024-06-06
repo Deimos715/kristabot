@@ -12,15 +12,15 @@ bot = telebot.TeleBot(config.token)
 @bot.message_handler(commands=['help'])
 def help_message(message):
     bot.send_message(message.chat.id, 'Основыне команды /start - Приветствие; /help - справка; /get_min_b - '
-                                      'запрос документов с Минфина России (раздел бюджетной классификации).  '
-                                      '/get_min_m - ''запрос документов с Минфина России (методический кабинет). '
-                                      '/get_ros - запрос документов с Росказны (Письма о резервировании). ')
+                                    'запрос документов с Минфина России (раздел бюджетной классификации).  '
+                                    '/get_min_m - ''запрос документов с Минфина России (методический кабинет). '
+                                    '/get_ros - запрос документов с Росказны (Письма о резервировании). ')
 
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
     bot.send_message(message.chat.id, 'Привет, я бот-парсер. Помогу тебе запросить последние документы по бюджетной '
-                                      'классифкации. Отправь /help для справки.')
+                                    'классифкации. Отправь /help для справки.')
 
 
 @bot.message_handler(commands=['get_min_b'])
@@ -96,7 +96,7 @@ def scheduled_task_ros():
 
 
 def scheduler():
-    schedule.every().day.at("07:00").do(scheduled_task_min_b)
+    schedule.every().day.at("07:55").do(scheduled_task_min_b)
     schedule.every().day.at("07:05").do(scheduled_task_min_m)
     schedule.every().day.at("07:10").do(scheduled_task_ros)
 
@@ -104,7 +104,7 @@ def scheduler():
     schedule.every().day.at("12:05").do(scheduled_task_min_m)
     schedule.every().day.at("12:10").do(scheduled_task_ros)
 
-    schedule.every().day.at("16:00").do(scheduled_task_min_b)
+    schedule.every().day.at("22:49").do(scheduled_task_min_b)
     schedule.every().day.at("16:05").do(scheduled_task_min_m)
     schedule.every().day.at("16:10").do(scheduled_task_ros)
     while True:
