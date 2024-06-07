@@ -96,7 +96,7 @@ def scheduled_task_ros():
 
 
 def scheduler():
-    schedule.every().day.at("07:55").do(scheduled_task_min_b)
+    schedule.every().day.at("07:00").do(scheduled_task_min_b)
     schedule.every().day.at("07:05").do(scheduled_task_min_m)
     schedule.every().day.at("07:10").do(scheduled_task_ros)
 
