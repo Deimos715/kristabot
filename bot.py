@@ -5,6 +5,7 @@ import time
 import schedule
 import threading
 import scripts
+from chats import send_message_to_all_chats
 
 bot = telebot.TeleBot(config.token)
 
@@ -73,26 +74,26 @@ def update_message_ros(message):
 
 def scheduled_task_min_b():
     print('запуск')
-    bot.send_message(355908770, 'Начало выполнения задачи. Минфин - бюджет')
+    send_message_to_all_chats(bot, 'Начало выполнения задачи. Минфин - бюджет')
     scripts.parser_min_b('https://minfin.gov.ru/ru/perfomance/budget/classandaccounting/npa')
-    bot.send_message(355908770, 'Задача выполнена')
-    bot.send_message(355908770, '****************')
+    send_message_to_all_chats(bot, 'Задача выполнена')
+    send_message_to_all_chats(bot, '****************')
 
 
 def scheduled_task_min_m():
     print('запуск')
-    bot.send_message(355908770, 'Начало выполнения задачи. Минфин - метод кабинет')
+    send_message_to_all_chats(bot, 'Начало выполнения задачи. Минфин - метод кабинет')
     scripts.parser_min_m('https://minfin.gov.ru/ru/perfomance/budget/classandaccounting/metod')
-    bot.send_message(355908770, 'Задача выполнена')
-    bot.send_message(355908770, '****************')
+    send_message_to_all_chats(bot, 'Задача выполнена')
+    send_message_to_all_chats(bot, '****************')
 
 
 def scheduled_task_ros():
     print('запуск')
-    bot.send_message(355908770, 'Начало выполнения задачи. Росказна')
+    send_message_to_all_chats(bot, 'Начало выполнения задачи. Росказна')
     scripts.parser_ros('https://www.roskazna.gov.ru/dokumenty/uchet-i-raspredelenie-postupleniy')
-    bot.send_message(355908770, 'Задача выполнена')
-    bot.send_message(355908770, '****************')
+    send_message_to_all_chats(bot, 'Задача выполнена')
+    send_message_to_all_chats(bot, '****************')
 
 
 def scheduler():

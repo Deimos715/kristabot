@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import my_bd_command
 import time
 from random import uniform
+from chats import send_message_to_all_chats
 
 bot = telebot.TeleBot(config.token)
 
@@ -21,10 +22,10 @@ def get_pages_count_min_b(html):
     soup = BeautifulSoup(html, 'html.parser')
     try:
         pagination = soup.find('a', class_='button_more').get("data-page-count")
-        bot.send_message(355908770, 'Всего страниц: ' + pagination)
+        send_message_to_all_chats(bot, 'Всего страниц: ' + pagination)
         return int(pagination)
     except Exception:
-        bot.send_message(355908770, 'Количество страниц не найдено')
+        send_message_to_all_chats(bot, 'Количество страниц не найдено')
 
 
 def get_content_min_b(html):
@@ -90,7 +91,7 @@ def get_content_min_b(html):
                     'Зарегистрирован': reg,
                     'Доп. ссылка на файл:': link_download
                 })
-                bot.send_message(355908770,
+                send_message_to_all_chats(bot,
                                 f'Свойство: {tag}\n'
                                 f'Заголовок: {title_doc}\n'
                                 f'Тип документа: {type_doc}\n'
@@ -99,12 +100,12 @@ def get_content_min_b(html):
                                 f'Ссылка: {link_doc}\n'
                                 f'Ссылка на файл: {file_info_doc}\n'
                                 f'Доп. ссылка на файл: {link_download}\n')
-                bot.send_message(355908770, '[INFO] Документ добавлен в БД')
+                send_message_to_all_chats(bot, '[INFO] Документ добавлен в БД')
 
         except Exception as ex:
-            bot.send_message(355908770, '[X] Ошибка вставки данных в БД', ex)
+            send_message_to_all_chats(bot, '[X] Ошибка вставки данных в БД', ex)
             continue
-    bot.send_message(355908770, 'Количество новых документов: ' + str(len(data)))
+    send_message_to_all_chats(bot, 'Количество новых документов: ' + str(len(data)))
     return data
 
 
@@ -113,19 +114,19 @@ def parser_min_b(url):
     data = []
     pages = 2  # берем для примера только 2 страницы
     for page in range(1, pages + 1):
-        bot.send_message(355908770, f'Сбор со страницы {page}')
+        send_message_to_all_chats(bot, f'Сбор со страницы {page}')
         while True:
             try:
                 data.extend(get_content_min_b(get_html_min_b(url, params={'page_65': page})))
                 time.sleep(1)
                 break
             except:
-                bot.send_message(355908770, 'Доступ прерван, ждем 5 сек.')
+                send_message_to_all_chats(bot, 'Доступ прерван, ждем 5 сек.')
                 for sec in range(1, 5):
                     time.sleep(1)
-                    bot.send_message(355908770, f'{sec}...')
-                bot.send_message(355908770, 'перезапуск')
-    bot.send_message(355908770, 'Получено ' + str(len(data)) + ' позиций(-я, -и)')
+                    send_message_to_all_chats(bot, f'{sec}...')
+                send_message_to_all_chats(bot, 'перезапуск')
+    send_message_to_all_chats(bot, 'Получено ' + str(len(data)) + ' позиций(-я, -и)')
 
 
 # parser_minfin(таблицы)
@@ -140,10 +141,10 @@ def get_pages_count_min_m(html):
     soup = BeautifulSoup(html, 'html.parser')
     try:
         pagination = soup.find('a', class_='button_more').get("data-page-count")
-        bot.send_message(355908770, 'Всего страниц: ' + pagination)
+        send_message_to_all_chats(bot, 'Всего страниц: ' + pagination)
         return int(pagination)
     except Exception:
-        bot.send_message(355908770, 'Количество страниц не найдено')
+        send_message_to_all_chats(bot, 'Количество страниц не найдено')
 
 
 def get_content_min_m(html):
@@ -209,7 +210,7 @@ def get_content_min_m(html):
                     'Зарегистрирован': reg,
                     'Доп. ссылка на файл:': link_download
                 })
-                bot.send_message(355908770,
+                send_message_to_all_chats(bot,
                                 f'Свойство: {tag}\n'
                                 f'Заголовок: {title_doc}\n'
                                 f'Тип документа: {type_doc}\n'
@@ -218,12 +219,12 @@ def get_content_min_m(html):
                                 'Ссылка: {link_doc}\n'
                                 f'Ссылка на файл: {file_info_doc}\n'
                                 f'Доп. ссылка на файл: {link_download}\n')
-                bot.send_message(355908770, '[INFO] Документ добавлен в БД')
+                send_message_to_all_chats(bot, '[INFO] Документ добавлен в БД')
 
         except Exception as ex:
-            bot.send_message(355908770, '[X] Ошибка вставки данных в БД', ex)
+            send_message_to_all_chats(bot, '[X] Ошибка вставки данных в БД', ex)
             continue
-    bot.send_message(355908770, 'Количество новых документов: ' + str(len(data)))
+    send_message_to_all_chats(bot, 'Количество новых документов: ' + str(len(data)))
     return data
 
 
@@ -232,19 +233,19 @@ def parser_min_m(url):
     data = []
     pages = 2  # берем для примера только 2 страницы
     for page in range(1, pages + 1):
-        bot.send_message(355908770, f'Сбор со страницы {page}')
+        send_message_to_all_chats(bot, f'Сбор со страницы {page}')
         while True:
             try:
                 data.extend(get_content_min_m(get_html_min_m(url, params={'page_65': page})))
                 time.sleep(1)
                 break
             except:
-                bot.send_message(355908770, 'Доступ прерван, ждем 5 сек.')
+                send_message_to_all_chats(bot, 'Доступ прерван, ждем 5 сек.')
                 for sec in range(1, 5):
                     time.sleep(1)
-                    bot.send_message(355908770, f'{sec}...')
-                bot.send_message(355908770, 'перезапуск')
-    bot.send_message(355908770, 'Получено ' + str(len(data)) + ' позиций(-я, -и)')
+                    send_message_to_all_chats(bot, f'{sec}...')
+                send_message_to_all_chats(bot, 'перезапуск')
+    send_message_to_all_chats(bot, 'Получено ' + str(len(data)) + ' позиций(-я, -и)')
 
 
 # parser_roskazna
@@ -269,9 +270,9 @@ def get_pages_count_ros(html):
             pages = 1
     except Exception:
         pages = 1
-        bot.send_message(355908770, 'Пагинация не найдена, страница будет обработана как единственная')
+        send_message_to_all_chats(bot, 'Пагинация не найдена, страница будет обработана как единственная')
 
-    bot.send_message(355908770, 'Всего страниц: ' + str(pages))
+    send_message_to_all_chats(bot, 'Всего страниц: ' + str(pages))
     return int(pages)
 
 
@@ -304,16 +305,16 @@ def get_content_ros(html):
                     'Дата документа': publication,
                     'Ссылка на PDF файл': pdf_link
                 })
-                bot.send_message(355908770,
+                send_message_to_all_chats(bot,
                                 f'Заголовок документа: {title}\n'
                                 f'Дата документа: {publication}\n'
                                 f'Ссылка на PDF файл: {pdf_link}\n')
-                bot.send_message(355908770, '[INFO] Документ добавлен в БД')
+                send_message_to_all_chats(bot, '[INFO] Документ добавлен в БД')
 
         except Exception as ex:
-            bot.send_message(355908770, '[X] Ошибка вставки данных в БД', ex)
+            send_message_to_all_chats(bot, '[X] Ошибка вставки данных в БД', ex)
             continue
-    bot.send_message(355908770, 'Количество новых документов: ' + str(len(data)))
+    send_message_to_all_chats(bot, 'Количество новых документов: ' + str(len(data)))
     return data
 
 
@@ -325,15 +326,15 @@ def parser_ros(url):
         while True:
             try:
                 html = get_html_ros(url, params={'PAGEN_1': page})
-                bot.send_message(355908770, f'Парсинг страницы {page} из {pages}...')
+                send_message_to_all_chats(bot, f'Парсинг страницы {page} из {pages}...')
                 data.extend(get_content_ros(html))
                 # Выставим задержку между страницами, чтоб сайт не заблочил нас
                 time.sleep(uniform(1, 2))
                 break
             except:
-                bot.send_message(355908770, 'Доступ прерван, ждем 5 сек.')
+                send_message_to_all_chats(bot, 'Доступ прерван, ждем 5 сек.')
                 for sec in range(1, 5):
                     time.sleep(1)
-                    bot.send_message(355908770, f'{sec}...')
-                bot.send_message(355908770, 'перезапуск')
-    bot.send_message(355908770, 'Получено ' + str(len(data)) + ' позиций(-я, -и)')
+                    send_message_to_all_chats(bot, f'{sec}...')
+                send_message_to_all_chats(bot, 'перезапуск')
+    send_message_to_all_chats(bot, 'Получено ' + str(len(data)) + ' позиций(-я, -и)')
