@@ -4,6 +4,7 @@ import config
 from bs4 import BeautifulSoup
 import my_bd_command
 import time
+import datetime
 from random import uniform
 from chats import send_message_to_all_chats
 from proxy import get_proxies
@@ -341,3 +342,90 @@ def parser_ros(url):
                     send_message_to_all_chats(bot, f'{sec}...')
                 send_message_to_all_chats(bot, 'перезапуск')
     send_message_to_all_chats(bot, 'Получено ' + str(len(data)) + ' позиций(-я, -и)')
+
+
+#parser_gov
+def fetch_documents(url):
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        response.raise_for_status()
+
+def clean_text(text):
+    if text:
+        return text.replace('<br />', ' ').replace('\n', ' ').replace('\\', ' ')
+    return text
+
+def parse_documents(data):
+    documents = []
+    new_documents_count = 0
+    for item in data.get('items', []):
+        view_date = item.get('viewDate', '')
+        complex_name = clean_text(item.get('complexName', ''))
+        document_date_str = item.get('documentDate', '')
+        reg_number = item.get('jdRegNumber', '')
+        document_date_reg_str = item.get('jdRegDate', '')
+        pages_count = item.get('pagesCount', '')
+        eo_number = item.get('eoNumber', '')
+        link_doc = f"http://publication.pravo.gov.ru/document/{eo_number}"
+
+        # Функция преобразования даты из формата YYYY-MM-DDTHH:MM:SS в DD-MM-YYYY
+        def convert_date(date_str):
+            if date_str:
+                try:
+                    # Проверяем специальный случай, когда дата равна '0001-01-01T00:00:00'
+                    if date_str == '0001-01-01T00:00:00':
+                        return 'Дата не определена'
+                    return datetime.datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%S').strftime('%d.%m.%Y')
+                except ValueError:
+                    return 'Дата не определена'
+            return 'Дата не определена'
+        
+        # Преобразования даты
+        document_date = convert_date(document_date_str)
+        document_date_reg = convert_date(document_date_reg_str)
+
+        try:
+            if my_bd_command.check_gov(complex_name) == 0:
+                my_bd_command.insert_gov(view_date, complex_name, document_date, reg_number, document_date_reg, pages_count, eo_number, link_doc)
+                new_documents_count += 1
+
+            document = {
+                'Дата публикации': view_date,
+                'Наименование документа': complex_name,
+                'Дата документа': document_date,
+                'Номер регистрации в Минюсте': reg_number,
+                'Дата регистрации в Минюсте': document_date_reg,
+                'Количество страниц в PDF файле документа': pages_count,
+                'Номер электронного опубликования': eo_number,
+                'Ссылка на документ': link_doc
+            }
+            documents.append(document)
+            if new_documents_count > 0:
+                send_message_to_all_chats(bot,
+                    f'Дата публикации: {view_date}\n'
+                    f'Наименование документа: {complex_name}\n'
+                    f'Дата документа: {document_date}\n'
+                    f'Номер регистрации в Минюсте: {reg_number}\n'
+                    f'Дата регистрации в Минюсте: {document_date_reg}\n'
+                    f'Количество страниц в PDF файле документа: {pages_count}\n'
+                    f'Номер электронного опубликования: {eo_number}\n'
+                    f'Ссылка на документ: {link_doc}\n')
+        except Exception as ex:
+            send_message_to_all_chats(bot, '[X] Ошибка вставки данных в БД', ex)
+            continue
+
+    if new_documents_count > 0:
+        send_message_to_all_chats(bot, '[INFO] Документы добавлены в БД')
+        
+    send_message_to_all_chats(bot, f'Количество новых документов: {new_documents_count}')
+    return documents
+
+def main(url):
+    data = fetch_documents(url)
+    if data:
+        parsed_documents = parse_documents(data)
+
+if __name__ == "__main__":
+    main()

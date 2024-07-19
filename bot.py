@@ -13,9 +13,10 @@ bot = telebot.TeleBot(config.token)
 @bot.message_handler(commands=['help'])
 def help_message(message):
     bot.send_message(message.chat.id, 'Основыне команды /start - Приветствие; /help - справка; /get_min_b - '
-                                    'запрос документов с Минфина России (раздел бюджетной классификации).  '
-                                    '/get_min_m - ''запрос документов с Минфина России (методический кабинет). '
-                                    '/get_ros - запрос документов с Росказны (Письма о резервировании). ')
+                                    'запрос документов с Минфина России (раздел бюджетной классификации). '
+                                    '/get_min_m - ''запрос документов с Минфина России (методический кабинет).'
+                                    '/get_ros - запрос документов с Росказны (Письма о резервировании).'
+                                    '/get_gov - запрос документов с раздела «Официальное опубликование».)')
 
 
 @bot.message_handler(commands=['start'])
@@ -72,6 +73,14 @@ def update_message_ros(message):
     scripts.parser_ros(url)
 
 
+@bot.message_handler(commands=['get_gov'])
+def update_message_gov(message):
+    # parser_gov
+    url = 'http://publication.pravo.gov.ru/api/Documents?DocumentTypes=2dddb344-d3e2-4785-a899-7aa12bd47b6f&Name=Приказ Министерства финансов Российской Федерации'
+    bot.send_message(message.chat.id, 'Запрос данных с раздела «Официальное опубликование»')
+    scripts.main(url)
+
+
 def scheduled_task_min_b():
     print('запуск')
     send_message_to_all_chats(bot, 'Начало выполнения задачи. Минфин - бюджет')
@@ -96,18 +105,30 @@ def scheduled_task_ros():
     send_message_to_all_chats(bot, '****************')
 
 
+def scheduled_task_gov():
+    print('запуск')
+    send_message_to_all_chats(bot, 'Начало выполнения задачи. Раздел «Официальное опубликование»')
+    url = 'http://publication.pravo.gov.ru/api/Documents?DocumentTypes=2dddb344-d3e2-4785-a899-7aa12bd47b6f&Name=Приказ Министерства финансов Российской Федерации'
+    scripts.main(url)
+    send_message_to_all_chats(bot, 'Задача выполнена')
+    send_message_to_all_chats(bot, '****************')
+
+
 def scheduler():
     schedule.every().day.at("07:00").do(scheduled_task_min_b)
     schedule.every().day.at("07:05").do(scheduled_task_min_m)
     schedule.every().day.at("07:10").do(scheduled_task_ros)
+    schedule.every().day.at("07:15").do(scheduled_task_gov)
 
     schedule.every().day.at("12:00").do(scheduled_task_min_b)
     schedule.every().day.at("12:05").do(scheduled_task_min_m)
     schedule.every().day.at("12:10").do(scheduled_task_ros)
+    schedule.every().day.at("12:15").do(scheduled_task_gov)
 
     schedule.every().day.at("16:00").do(scheduled_task_min_b)
     schedule.every().day.at("16:05").do(scheduled_task_min_m)
     schedule.every().day.at("16:10").do(scheduled_task_ros)
+    schedule.every().day.at("16:15").do(scheduled_task_gov)
     while True:
         now = datetime.datetime.now()
         # Проверяем, является ли текущий день рабочим днем
