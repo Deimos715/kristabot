@@ -359,7 +359,6 @@ def clean_text(text):
 
 def parse_documents(data):
     documents = []
-    new_documents_count = 0
     for item in data.get('items', []):
         view_date = item.get('viewDate', '')
         complex_name = clean_text(item.get('complexName', ''))
@@ -389,21 +388,17 @@ def parse_documents(data):
         try:
             if my_bd_command.check_gov(complex_name) == 0:
                 my_bd_command.insert_gov(view_date, complex_name, document_date, reg_number, document_date_reg, pages_count, eo_number, link_doc)
-                new_documents_count += 1
-
-            document = {
-                'Дата публикации': view_date,
-                'Наименование документа': complex_name,
-                'Дата документа': document_date,
-                'Номер регистрации в Минюсте': reg_number,
-                'Дата регистрации в Минюсте': document_date_reg,
-                'Количество страниц в PDF файле документа': pages_count,
-                'Номер электронного опубликования': eo_number,
-                'Ссылка на документ': link_doc
-            }
-            documents.append(document)
-            if new_documents_count > 0:
-                send_message_to_all_chats(bot,
+                documents.append({
+                    'Дата публикации': view_date,
+                    'Наименование документа': complex_name,
+                    'Дата документа': document_date,
+                    'Номер регистрации в Минюсте': reg_number,
+                    'Дата регистрации в Минюсте': document_date_reg,
+                    'Количество страниц в PDF файле документа': pages_count,
+                    'Номер электронного опубликования': eo_number,
+                    'Ссылка на документ': link_doc
+                })
+                send_message_to_all_chats(bot, 
                     f'Дата публикации: {view_date}\n'
                     f'Наименование документа: {complex_name}\n'
                     f'Дата документа: {document_date}\n'
@@ -412,14 +407,12 @@ def parse_documents(data):
                     f'Количество страниц в PDF файле документа: {pages_count}\n'
                     f'Номер электронного опубликования: {eo_number}\n'
                     f'Ссылка на документ: {link_doc}\n')
+                send_message_to_all_chats(bot, '[INFO] Документ добавлен в БД')
+
         except Exception as ex:
             send_message_to_all_chats(bot, '[X] Ошибка вставки данных в БД', ex)
             continue
-
-    if new_documents_count > 0:
-        send_message_to_all_chats(bot, '[INFO] Документы добавлены в БД')
-        
-    send_message_to_all_chats(bot, f'Количество новых документов: {new_documents_count}')
+    send_message_to_all_chats(bot, 'Количество новых документов: ' + str(len(documents)))
     return documents
 
 def main(url):
