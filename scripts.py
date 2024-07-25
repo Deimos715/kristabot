@@ -344,7 +344,7 @@ def parser_ros(url):
     send_message_to_all_chats(bot, 'Получено ' + str(len(data)) + ' позиций(-я, -и)')
 
 
-#parser_gov
+#parser_Publication_gov
 def fetch_documents(url):
     response = requests.get(url)
     if response.status_code == 200:
@@ -386,8 +386,8 @@ def parse_documents(data):
         document_date_reg = convert_date(document_date_reg_str)
 
         try:
-            if my_bd_command.check_gov(complex_name) == 0:
-                my_bd_command.insert_gov(view_date, complex_name, document_date, reg_number, document_date_reg, pages_count, eo_number, link_doc)
+            if my_bd_command.check_govp(complex_name) == 0:
+                my_bd_command.insert_govp(view_date, complex_name, document_date, reg_number, document_date_reg, pages_count, eo_number, link_doc)
                 documents.append({
                     'Дата публикации': view_date,
                     'Наименование документа': complex_name,

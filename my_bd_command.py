@@ -120,13 +120,13 @@ def get_data_from_db_min():
 
 
 # Создание БД Publication_gov
-def create_table_gov():
+def create_table_govp():
     with sqlite3.connect('bot_bd.db') as db:
         cursor = db.cursor()
 
         # Создание таблицы
         cursor.execute('''
-        CREATE TABLE IF NOT EXISTS GOV(
+        CREATE TABLE IF NOT EXISTS GOVP(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         view_date TEXT,
         complex_name TEXT,
@@ -141,23 +141,23 @@ def create_table_gov():
         db.commit()
 
 
-def insert_gov(col1, col2, col3, col4, col5, col6, col7, col8):
+def insert_govp(col1, col2, col3, col4, col5, col6, col7, col8):
     # Вставка в таблицу БД
     with sqlite3.connect('bot_bd.db') as db:
         cursor = db.cursor()
         data_list = (col1, col2, col3, col4, col5, col6, col7, col8, datetime.datetime.now())
         cursor.execute('''
-                        INSERT INTO gov (view_date, complex_name, document_date, reg_number, document_date_reg, pages_count, eo_number, link_doc, parsing_date)
+                        INSERT INTO govp (view_date, complex_name, document_date, reg_number, document_date_reg, pages_count, eo_number, link_doc, parsing_date)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
                             ''', data_list)
         db.commit()
 
 
-def check_gov(complex_name):
+def check_govp(complex_name):
     # Проверка записи на наличие в базе
     with sqlite3.connect('bot_bd.db') as db:
         cursor = db.cursor()
-        cursor.execute('''SELECT complex_name FROM gov WHERE complex_name = ? ''', (complex_name,))
+        cursor.execute('''SELECT complex_name FROM govp WHERE complex_name = ? ''', (complex_name,))
         result = cursor.fetchall()
         if len(result) == 0:
             print('[INFO] Такой записи нет')
@@ -167,12 +167,12 @@ def check_gov(complex_name):
             return 1
 
 
-def get_data_from_db_gov():
+def get_data_from_db_govp():
     # Получение данных из БД
     with sqlite3.connect('bot_bd.db') as db:
         cursor = db.cursor()
         cursor.execute('''SELECT view_date, complex_name, document_date, reg_number, document_date_reg, pages_count, eo_number, link_doc FROM 
-        gov''')
+        govp''')
         # Вывод всех документов
         data_set = cursor.fetchall()
         return data_set
