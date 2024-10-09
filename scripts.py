@@ -17,7 +17,7 @@ proxies = get_proxies()
 # parser_minfin(приказы)
 def get_html_min_b(url, params=None):
     headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) (KHTML, like Gecko) Chrome/87.0.4280.66'}
-    response = requests.get(url, headers=headers, params=params, proxies=proxies)
+    response = requests.get(url, headers=headers, params=params, proxies=proxies, verify=False)
     html = response.text
     return html
 
@@ -136,7 +136,7 @@ def parser_min_b(url):
 # parser_minfin(таблицы)
 def get_html_min_m(url, params=None):
     headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) (KHTML, like Gecko) Chrome/87.0.4280.66'}
-    response = requests.get(url, headers=headers, params=params, proxies=proxies)
+    response = requests.get(url, headers=headers, params=params, proxies=proxies, verify=False)
     html = response.text
     return html
 
