@@ -10,6 +10,8 @@ from chats import send_message_to_all_chats
 from proxy import get_proxies
 from dotenv import load_dotenv
 
+load_dotenv()
+
 bot = telebot.TeleBot(os.getenv('token'))
 
 #proxy

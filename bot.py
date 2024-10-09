@@ -8,6 +8,8 @@ import scripts
 from chats import send_message_to_all_chats
 from dotenv import load_dotenv
 
+load_dotenv()
+
 bot = telebot.TeleBot(os.getenv('token'))
 
 
