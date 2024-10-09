@@ -1,4 +1,4 @@
-import config
+import os
 import telebot
 import datetime
 import time
@@ -6,8 +6,9 @@ import schedule
 import threading
 import scripts
 from chats import send_message_to_all_chats
+from dotenv import load_dotenv
 
-bot = telebot.TeleBot(config.token)
+bot = telebot.TeleBot(os.getenv('token'))
 
 
 @bot.message_handler(commands=['help'])

@@ -1,6 +1,6 @@
+import os
 import requests
 import telebot
-import config
 from bs4 import BeautifulSoup
 import my_bd_command
 import time
@@ -8,8 +8,9 @@ import datetime
 from random import uniform
 from chats import send_message_to_all_chats
 from proxy import get_proxies
+from dotenv import load_dotenv
 
-bot = telebot.TeleBot(config.token)
+bot = telebot.TeleBot(os.getenv('token'))
 
 #proxy
 proxies = get_proxies()
