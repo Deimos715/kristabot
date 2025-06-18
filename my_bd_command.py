@@ -66,7 +66,7 @@ def create_table_min():
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS MINFIN(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        link_doc TEXT
+        link_doc TEXT,
         tag TEXT,
         date_doc TEXT,
         type_doc TEXT,
@@ -74,29 +74,31 @@ def create_table_min():
         file_info_doc TEXT,
         reg TEXT,
         link_download TEXT,
+        date_update TEXT,
         parsing_date DATE
         );''')
         db.commit()
 
 
-def insert_min(col1, col2, col3, col4, col5, col6, col7, col8):
+def insert_min(col1, col2, col3, col4, col5, col6, col7, col8, col9):
     # Вставка в таблицу БД
     with sqlite3.connect('bot_bd.db') as db:
         cursor = db.cursor()
-        data_list = (col1, col2, col3, col4, str(col5), str(col6), col7, str(col8), datetime.datetime.now())
+        data_list = (col1, col2, col3, col4, str(col5), str(col6), col7, str(col8), str(col9), datetime.datetime.now())
         cursor.execute('''
                         INSERT INTO minfin (link_doc, tag, date_doc, type_doc, title_doc, file_info_doc, reg, 
-                        link_download, parsing_date)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+                        link_download, date_update, parsing_date)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
                             ''', data_list)
         db.commit()
 
 
-def check_min(link_download):
+def check_min(title_doc, date_update):
     # Проверка записи на наличие в базе
     with sqlite3.connect('bot_bd.db') as db:
         cursor = db.cursor()
-        cursor.execute('''SELECT link_download FROM minfin WHERE link_download = ? ''', (link_download,))
+        cursor.execute('''
+            SELECT id FROM minfin WHERE title_doc = ? AND date_update = ? ''', (title_doc, date_update))
         result = cursor.fetchall()
         if len(result) == 0:
             print('[INFO] Такой записи нет')
@@ -110,7 +112,7 @@ def get_data_from_db_min():
     # Получение данных из БД
     with sqlite3.connect('bot_bd.db') as db:
         cursor = db.cursor()
-        cursor.execute('''SELECT link_doc, tag, date_doc, type_doc, title_doc, file_info_doc, reg, link_download FROM 
+        cursor.execute('''SELECT link_doc, tag, date_doc, type_doc, title_doc, file_info_doc, reg, link_download, date_update FROM 
         minfin''')
         # Вывод всех документов
         data_set = cursor.fetchall()

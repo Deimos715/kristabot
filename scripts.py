@@ -7,20 +7,17 @@ import time
 import datetime
 from random import uniform
 from chats import send_message_to_all_chats
-from proxy import get_proxies
 from dotenv import load_dotenv
 
 load_dotenv()
 
 bot = telebot.TeleBot(os.getenv('token'))
 
-#proxy
-proxies = get_proxies()
 
 # parser_minfin(приказы)
 def get_html_min_b(url, params=None):
     headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) (KHTML, like Gecko) Chrome/87.0.4280.66'}
-    response = requests.get(url, headers=headers, params=params, proxies=proxies, verify=False)
+    response = requests.get(url, headers=headers, params=params, verify=False)
     html = response.text
     return html
 
@@ -30,7 +27,7 @@ def get_pages_count_min_b(html):
     try:
         pagination = soup.find('a', class_='button_more').get("data-page-count")
         send_message_to_all_chats(bot, 'Всего страниц: ' + pagination)
-        return int(pagination)
+        return int(pagination)-749620842
     except Exception:
         send_message_to_all_chats(bot, 'Количество страниц не найдено')
 
@@ -62,7 +59,7 @@ def get_content_min_b(html):
             type_doc = 'Тип документа не найден'
 
         try:
-            title_doc = block.find('a', class_='document_title').get_text(strip=True)
+            title_doc = block.find('a', class_='document_title').get_text(strip=True) # Берем берем для проверки записей в БД
         except:
             title_doc = 'Заголовок документа не найден'
 
@@ -82,11 +79,17 @@ def get_content_min_b(html):
             link_download = 'https://minfin.gov.ru' + sub_page_soup.find('a', class_='download_btn').get('href')
         except:
             link_download = 'Доп. ссылка на файл не найдена'
+        try:
+            info_block = sub_page_soup.find('div', class_='document_data_information')
+            spans = info_block.find_all('span', class_='t_mn2') if info_block else []
+            date_update = spans[1].get_text(strip=True) if len(spans) >= 2 else 'Дата обновления не найдена' # берем срез второго класса
+        except:
+            date_update = 'Дата обновления не найдена'
 
         try:
-            if my_bd_command.check_min(link_download) == 0:
+            if my_bd_command.check_min(title_doc, date_update) == 0:
                 my_bd_command.insert_min(link_doc, tag, date_doc, type_doc, title_doc, file_info_doc, reg,
-                                        link_download)
+                                        link_download, date_update)
                 data.append({
                     'Ссылка на документ': link_doc,
                     'Тег': tag,
@@ -95,6 +98,7 @@ def get_content_min_b(html):
                     'Заголовок документа': title_doc,
                     'Ссылка на файл': file_info_doc,
                     # Детализация документа
+                    'Дата обновления': date_update,
                     'Зарегистрирован': reg,
                     'Доп. ссылка на файл:': link_download
                 })
@@ -103,6 +107,7 @@ def get_content_min_b(html):
                                 f'Заголовок: {title_doc}\n'
                                 f'Тип документа: {type_doc}\n'
                                 f'Дата публикации: {date_doc.replace("Опубликовано: ", "")}\n'
+                                f'Дата изменения: {date_update.replace("Изменено: ", "")}\n'
                                 f'Регистрационная информация: {reg}\n'
                                 f'Ссылка: {link_doc}\n'
                                 f'Ссылка на файл: {file_info_doc}\n'
@@ -139,7 +144,7 @@ def parser_min_b(url):
 # parser_minfin(таблицы)
 def get_html_min_m(url, params=None):
     headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) (KHTML, like Gecko) Chrome/87.0.4280.66'}
-    response = requests.get(url, headers=headers, params=params, proxies=proxies, verify=False)
+    response = requests.get(url, headers=headers, params=params, verify=False)
     html = response.text
     return html
 
@@ -181,7 +186,7 @@ def get_content_min_m(html):
             type_doc = 'Тип документа не найден'
 
         try:
-            title_doc = block.find('a', class_='document_title').get_text(strip=True)
+            title_doc = block.find('a', class_='document_title').get_text(strip=True) # Берем берем для проверки записей в БД
         except:
             title_doc = 'Заголовок документа не найден'
 
@@ -201,11 +206,17 @@ def get_content_min_m(html):
             link_download = 'https://minfin.gov.ru' + sub_page_soup.find('a', class_='button_download').get('href')
         except:
             link_download = 'Доп. ссылка на файл не найдена'
+        try:
+            info_block = sub_page_soup.find('div', class_='document_data_information')
+            spans = info_block.find_all('span', class_='t_mn2') if info_block else []
+            date_update = spans[1].get_text(strip=True) if len(spans) >= 2 else 'Дата обновления не найдена' # берем срез второго класса
+        except:
+            date_update = 'Дата обновления не найдена'
 
         try:
-            if my_bd_command.check_min(link_download) == 0:
+            if my_bd_command.check_min(title_doc, date_update) == 0:
                 my_bd_command.insert_min(link_doc, tag, date_doc, type_doc, title_doc, file_info_doc, reg,
-                                        link_download)
+                                        link_download, date_update)
                 data.append({
                     'Ссылка на документ': link_doc,
                     'Тег': tag,
@@ -214,6 +225,7 @@ def get_content_min_m(html):
                     'Заголовок документа': title_doc,
                     'Ссылка на файл': file_info_doc,
                     # Детализация документа
+                    'Дата обновления': date_update,
                     'Зарегистрирован': reg,
                     'Доп. ссылка на файл:': link_download
                 })
@@ -222,6 +234,7 @@ def get_content_min_m(html):
                                 f'Заголовок: {title_doc}\n'
                                 f'Тип документа: {type_doc}\n'
                                 f'Дата публикации: {date_doc.replace("Опубликовано: ", "")}\n'
+                                f'Дата изменения: {date_update.replace("Изменено: ", "")}\n'
                                 f'Регистрационная информация: {reg}\n'
                                 'Ссылка: {link_doc}\n'
                                 f'Ссылка на файл: {file_info_doc}\n'
